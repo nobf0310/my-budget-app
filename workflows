@@ -1,1 +1,37 @@
+name: Firebase Deploy
 
+on:
+  push:
+    branches:
+      - main  # 如果你要在推送到 'main' 分支时触发部署，修改为你自己的分支
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 获取代码
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # 设置 Node.js 环境
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # 选择适当的 Node.js 版本
+
+      # 安装 Firebase CLI
+      - name: Install Firebase CLI
+        run: |
+          npm install -g firebase-tools
+
+      # 登录 Firebase CLI
+      - name: Firebase Login
+        run: |
+          firebase login:ci --token ${{ secrets.FIREBASE_TOKEN }}
+
+      # 部署到 Firebase Hosting
+      - name: Firebase Deploy
+        uses: jmsalazardev/firebase-deploy@v0.0.3
+        with:
+          firebase_project: 'your-project-id'  # 替换为你的 Firebase 项目 ID
+          firebase_token: ${{ secrets.FIREBASE_TOKEN }}  # 需要将 Firebase CI token 保存在 GitHub secrets 中
